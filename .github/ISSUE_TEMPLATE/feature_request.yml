@@ -1,0 +1,15 @@
+name: Feature request
+description: Suggest an API improvement or a new example.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Use case
+      description: What are you building, and what is difficult with the current API?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed API or example
+      description: Include a short sketch or describe the intended behavior.

@@ -1,0 +1,29 @@
+name: Bug report
+description: Report a reproducible library problem.
+body:
+  - type: input
+    id: environment
+    attributes:
+      label: Board and toolchain
+      description: Board revision, Arduino IDE/CLI version, and Arduino-ESP32 version.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal sketch and steps
+      description: Include the smallest sketch and steps that reproduce the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and observed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized output
+      description: Remove credentials, device identity data, and private information.
+      render: text
