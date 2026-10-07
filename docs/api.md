@@ -40,6 +40,8 @@ Initial orientation is portrait (240 × 320), RGB order, no mirroring, with the
 board's required inversion. Check rotations/color order on hardware when changing
 panel revisions. SPI and the backlight PWM pin are reserved while the display runs.
 
+`fillRoundedScreen(color)` fills the screen and paints a 30 px black corner mask, following the main firmware viewport rule. `applyCornerMask()` restores the mask after drawing a frame that reaches the corners. Both work without a framebuffer and follow current rotation dimensions. Keep text and controls inside a 24–30 px margin. Adafruit GFX/raw SPI drawing is not automatically clipped: call `applyCornerMask()` after any drawing that overwrites the corners.
+
 ## Buttons
 
 `Button` values: `None`, `Up`, `Down`, `Ok`.
@@ -71,6 +73,8 @@ The driver does not provision a cell profile, wake/restart the gauge, or change 
 registers. Gauge readiness and SOC accuracy depend on its existing configuration.
 A sleeping/unconfigured gauge may need the manufacturer's provisioning firmware.
 Transactions have the shared Wire timeout (100 ms when initialized by AIPassport).
+
+For the main firmware reference and cell-profile requirements, see [battery and fuel gauge notes](battery.md).
 
 ## Audio
 

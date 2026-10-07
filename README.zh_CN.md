@@ -1,10 +1,10 @@
-# FoloToy AI Passport
+# FoloToy AI Passport Arduino
 
 [English](README.md)
 
 面向 FoloToy AI Passport ESP32-C3 硬件的 Arduino 库。用统一的板级接口访问彩色屏幕、三颗按键、麦克风、扬声器和电量计，减少重复配置引脚的工作。
 
-当前为 `0.1.0` 首版实现。编译和主机测试结果见[验证记录](docs/validation.zh_CN.md)；尚未完成实机验收。仅支持本库记录的 ESP32-C3 AI Passport 引脚布局。
+当前为 `0.1.0` 首版实现。编译、主机测试及实机检查结果见[验证记录](docs/validation.zh_CN.md)；完整实机验收尚未完成。仅支持本库记录的 ESP32-C3 AI Passport 引脚布局。
 
 ## 功能
 
@@ -15,6 +15,8 @@
 - 各外设的独立示例，以及基于 ESP32 核心的 Wi-Fi 扫描示例。
 
 库本身不需要云账号、API 密钥或网络连接。音频和电池默认关闭，按需初始化。被动 NFC 标签未连接到 MCU，本库不提供其读写 API。
+
+硬件规格与板级行为参考 [AI Passport 主库](https://github.com/FoloToy/ai-passport)。500 mAh 电池、CW2017 读数及配置要求见[电池与电量计说明](docs/battery.zh_CN.md)。
 
 ## 环境与安装
 
@@ -94,6 +96,7 @@ if (!passport.begin(config)) {
 | [BatteryMonitor](examples/BatteryMonitor/BatteryMonitor.ino) | 读取电量和电压 |
 | [AudioTone](examples/AudioTone/AudioTone.ino) | 播放低音量 1 kHz 测试音 |
 | [MicrophoneLevel](examples/MicrophoneLevel/MicrophoneLevel.ino) | 输出麦克风峰值，不保存录音 |
+| [PushToTalk](examples/PushToTalk/PushToTalk.ino) | 按住 OK 录音，松开结束；UP 回放，最长 3 秒 |
 | [WiFiScan](examples/WiFiScan/WiFiScan.ino) | 扫描并显示附近网络，不连接 |
 
 ## 开发与贡献
@@ -114,3 +117,5 @@ bash tools/compile_examples.sh
 ## 许可
 
 FoloToy 编写的库代码和示例采用 [MIT License](LICENSE)。内置的乐鑫 ES8311 驱动子集采用 Apache-2.0，保留其版权与许可。Adafruit 库单独安装。来源及许可详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+
+录音交互、内存预算和验收步骤见[按住录音 Demo](docs/recording.zh_CN.md)。显示 Demo 使用 30 像素圆角，详见[显示 API](docs/api.zh_CN.md)。

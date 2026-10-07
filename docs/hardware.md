@@ -27,6 +27,8 @@ ESP32-C3 does not provide PSRAM. Stream audio in small chunks, and account for
 radio stacks when estimating memory. The NFC tag is passive and separate from the
 MCU. The hardware power button is separate from the three ADC function buttons.
 
+Battery specifications, CW2017 register conversions, and profile/power-management boundaries are documented in [battery and fuel gauge notes](battery.md).
+
 ## Flash layout and upload boundaries
 
 Every example includes the same custom partition file:
@@ -37,6 +39,7 @@ Every example includes the same custom partition file:
 | otadata | 0xe000 | 0x2000 |
 | factory | 0x10000 | 0x300000 |
 | cardid | 0x356000 | 0x4000 |
+| coredump | 0x35a000 | 0x10000 |
 
 The NVS/otadata arrangement matches the Arduino upload boot_app0 convention; it
 is not identical to the ESP-IDF production/launcher layout. The reserve for cardid

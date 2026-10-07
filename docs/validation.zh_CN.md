@@ -2,20 +2,35 @@
 
 [English](validation.md)
 
-验证日期：2026-10-07。目标：ESP32-C3、8 MB Flash，开启 USB CDC。
+验证日期：2026-10-07。ESP32-C3、8 MB Flash、Arduino-ESP32 3.3.12、Arduino CLI 1.5.1，开启 USB CDC。
 
 | 检查 | 状态 |
 | --- | --- |
-| Arduino Lint 1.3.0 strict / Library Manager submit 规则 | PASS，0 错误、0 警告 |
-| C++11 主机测试 | PASS |
-| Arduino-ESP32 3.3.12 的七个示例编译 | PASS，Linux CI，警告视为错误 |
-| 实际镜像的 ESP32-C3/8 MB 头及保留身份分区 | 七个示例全部 PASS |
-| macOS ARM64 WiFiScan / MicrophoneLevel 编译与产物检查 | PASS |
-| 实机测试 | NOT RUN |
+| 严格 Arduino Lint | PASS：无错误、无警告 |
+| C++11 主机测试 | PASS：按键阈值/时序/计时回绕、电压换算、示例分区 |
+| 九个示例本地编译 | PASS：所有警告作为错误处理 |
+| ESP32-C3 / 8 MB 镜像头与受保护分区 | 九个本地产物均 PASS |
+| 较早七示例 Linux CI | 源码 `80f3b5cd4c852d01ee6e000e152cbbb671266c66` PASS，不代表后续改动的验证 |
+| RGB 屏幕与文字 | PASS：用户确认较早 BoardSelfTest 画面正常 |
+| 扬声器测试音 | PASS：用户确认声音清楚连续 |
+| UP / DOWN / OK 短按与长按 | PASS：六次操作与设备事件匹配 |
+| 音频初始化/关闭循环 | PASS：五个采样率共 15 次；重复运行后堆内存稳定 |
+| 电量计通信 | PASS：较早读数 99%、约 4.15 V，未证明电量精度 |
+| Wi-Fi 扫描 | PASS：较早实机扫描返回 30 个网络 |
+| PushToTalk 三秒采集 | PASS：48,000 个采样，削波计数为 0 |
+| PushToTalk 回放与清除流程 | PASS：串口确认完整回放和清除；人声质量仍需试听确认 |
+| 新圆角界面 | PASS：用户确认界面正常、录音提示清楚 |
+| 人声质量与音量 | 12 dB / 35% 试录：用户确认人声清楚但音量小；24 dB / 65% 复测待确认 |
+| 新示例的短录音/重复录音/停止回放 | NOT RUN |
+| 原固件恢复 | 尚未验证 |
 
-主机测试覆盖 ADC 判定边界、消抖、短按/长按分离、稀疏轮询长按、millis 回绕、电压换算，以及示例分区一致、不重叠并保留 cardid。
+PushToTalk 应用镜像 SHA-256：`97d1e1af761a9e4e5f647b6ac1a4508d2695acaa076d217f77d3a0c73d743c36`。
+设备启动报告录音缓冲占用 96,000 字节，剩余堆内存 172,792 字节。首段三秒录音报告峰值 1235、RMS 134.23、削波样本 0、实际经过时间 2989 ms。这些值只描述该次录音，不保证所有距离和音量下的表现。
 
-已验证源码提交：`80f3b5cd4c852d01ee6e000e152cbbb671266c66`。
-[通过的 CI 记录](https://github.com/FoloToy/ai-passport-arduino/actions/runs/37589718957)。工具版本：Arduino CLI 1.5.1、Arduino-ESP32 3.3.12、Adafruit ST7735/ST7789 1.11.0、Adafruit GFX 1.12.6、Adafruit BusIO 1.17.4。全部示例实际镜像声明 ESP32-C3/8 MB，实际分区包含 3 MB factory 应用及 `0x356000/0x4000` 的 cardid。后续仅修改文档的提交不改变已验证源码和构建配置。
+实机测试仅写入 `0x10000` 的应用区域，保留已有 bootloader 和分区表；写入后不额外读取固件，使用 esptool 内置写入校验。保留的旧分区表没有 coredump 分区，因此 Arduino 预编译核心启动时会报告该分区缺失。新示例分区表已保留 coredump 区域，但尚未实机验证完整分区表安装。该启动提示不等于应用发生 panic。
 
-本次未烧录设备。屏幕颜色/方向、按键电压、codec 时钟、实际播放、非零麦克风输入、电量准确性、重复初始化/关闭、外设共存和旧固件恢复均待实机验证。面向社区发布稳定版前，应使用示例完成板级验收。
+后续验收包括人声试听、新界面显示、短录音/重复录音/停止回放、屏幕旋转与亮度、外设并发压力、充放电精度及原固件恢复。当前不宣称稳定版或公开发布完成。原始设备日志与 Flash 备份存放在仓库外。
+
+[较早通过的 CI](https://github.com/FoloToy/ai-passport-arduino/actions/runs/37589718957)。
+
+当前 24 dB / 65% 的 PushToTalk 复测镜像 SHA-256 为 `2d4e6bfca813bd4902057c3b2982727ec0586193d0801fc3875b827fa6d4fd60`，已按警告作为错误重新编译，并完成内置摘要写入校验。该版本试听和停止回放验收仍待确认；板卡当前保留此 Demo 供测试。

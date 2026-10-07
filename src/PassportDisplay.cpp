@@ -38,8 +38,6 @@ bool PassportDisplay::beginDisplay(uint8_t brightness) {
   delay(10);
   // The portrait panel uses RGB order and no X/Y mirroring.
   setRotation(0);
-  uint8_t madctl = 0;
-  sendCommand(0x36, &madctl, 1);
   invertDisplay(true);
   enableDisplay(true);
   fillScreen(ST77XX_BLACK);
@@ -48,10 +46,38 @@ bool PassportDisplay::beginDisplay(uint8_t brightness) {
   setBrightness(brightness);
   return true;
 }
+void PassportDisplay::setRotation(uint8_t requested) {
+  // The board's native portrait has no mirror bits; Adafruit calls it rotation 2.
+  // Keep the public rotation and dimensions consistent with native portrait = 0.
+  const uint8_t logical = requested & 3;
+  Adafruit_ST7789::setRotation((logical + 2) & 3);
+  rotation = logical;
+}
 void PassportDisplay::setBrightness(uint8_t percent) {
   if (!ready_) return;
   if (percent > 100) percent = 100;
   ledcWrite(PassportPins::backlight, 1023UL * percent / 100UL);
+}
+void PassportDisplay::fillRoundedScreen(uint16_t color) {
+  fillScreen(color);
+  applyCornerMask();
+}
+void PassportDisplay::applyCornerMask() {
+  // Only 60 short scan lines; no full-screen buffer on the no-PSRAM C3.
+  const int16_t radius = 30;
+  startWrite();
+  for (int16_t y = 0; y < radius; ++y) {
+    const int16_t dy = radius - y;
+    int16_t inset = 0;
+    while ((radius - inset) * (radius - inset) + dy * dy > radius * radius)
+      ++inset;
+    if (!inset) continue;
+    writeFastHLine(0, y, inset, ST77XX_BLACK);
+    writeFastHLine(width() - inset, y, inset, ST77XX_BLACK);
+    writeFastHLine(0, height() - 1 - y, inset, ST77XX_BLACK);
+    writeFastHLine(width() - inset, height() - 1 - y, inset, ST77XX_BLACK);
+  }
+  endWrite();
 }
 void PassportDisplay::end() {
   if (!ready_) return;

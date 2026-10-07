@@ -1,4 +1,4 @@
-# FoloToy AI Passport
+# FoloToy AI Passport Arduino
 
 [简体中文](README.zh_CN.md)
 
@@ -6,8 +6,8 @@ An Arduino library for the **FoloToy AI Passport ESP32-C3 board**. Build sketche
 with its color display, three buttons, microphone, speaker, and battery gauge
 without repeating the board's pin configuration.
 
-This is an early `0.1.0` implementation. Compilation and host tests are tracked in
-[validation](docs/validation.md); physical-board acceptance is still pending.
+This is an early `0.1.0` implementation. Builds, host tests, and device checks are tracked in
+[validation](docs/validation.md); full physical-board acceptance is still pending.
 Only the ESP32-C3 AI Passport pin map is supported.
 
 ## Features
@@ -21,6 +21,8 @@ Only the ESP32-C3 AI Passport pin map is supported.
 No cloud account, API key, or network connection is required by the library.
 Audio and battery initialization are opt-in, so sketches can use only what they need.
 The passive NFC tag is not connected to the MCU and has no software API here.
+
+Hardware specifications and board behavior follow the [AI Passport main repository](https://github.com/FoloToy/ai-passport). See [battery and fuel gauge notes](docs/battery.md) for the 500 mAh cell, CW2017 readings, and configuration requirements.
 
 ## Requirements
 
@@ -119,6 +121,7 @@ PCM format, and timing details.
 | [BatteryMonitor](examples/BatteryMonitor/BatteryMonitor.ino) | Read percentage and voltage |
 | [AudioTone](examples/AudioTone/AudioTone.ino) | Play a quiet 1 kHz tone |
 | [MicrophoneLevel](examples/MicrophoneLevel/MicrophoneLevel.ino) | Report microphone peak level without storing recordings |
+| [PushToTalk](examples/PushToTalk/PushToTalk.ino) | Hold OK to record, release to finish; UP replays (max 3 s) |
 | [WiFiScan](examples/WiFiScan/WiFiScan.ino) | Show nearby networks without connecting |
 
 ## Development
@@ -150,3 +153,5 @@ FoloToy library code and examples are released under the [MIT License](LICENSE).
 The included Espressif ES8311 driver subset is licensed under Apache-2.0; its
 copyright notices and license are retained. Adafruit libraries are installed
 separately. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for sources and licenses.
+
+See [push-to-talk recording](docs/recording.md) for controls, RAM use, and acceptance. Display demos use a 30 px rounded viewport; see the [display API](docs/api.md).

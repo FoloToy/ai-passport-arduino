@@ -2,30 +2,49 @@
 
 [简体中文](validation.zh_CN.md)
 
-Validation date: 2026-10-07. Target: ESP32-C3, 8 MB flash, USB CDC enabled.
+Validation date: 2026-10-07. ESP32-C3, 8 MB flash, Arduino-ESP32 3.3.12,
+Arduino CLI 1.5.1, USB CDC enabled.
 
 | Check | Status |
 | --- | --- |
-| Arduino Lint 1.3.0, strict, Library Manager submit rules | PASS: 0 errors, 0 warnings |
-| C++11 host tests | PASS |
-| Seven example builds with Arduino-ESP32 3.3.12 | PASS: Linux CI, warnings treated as errors |
-| Built ESP32-C3/8 MB headers and protected partition tables | PASS for all seven examples |
-| macOS ARM64 WiFiScan and MicrophoneLevel builds/artifact checks | PASS |
-| Physical-board tests | NOT RUN |
+| Strict Arduino Lint | PASS: no errors or warnings |
+| C++11 host tests | PASS: button thresholds/timing/rollover, voltage conversion, example partitions |
+| Nine local example builds | PASS: all warnings treated as errors |
+| ESP32-C3 / 8 MB image headers and protected partitions | PASS for all nine local builds |
+| Earlier seven-example Linux CI | PASS for source `80f3b5cd4c852d01ee6e000e152cbbb671266c66`; not validation of the later changes |
+| RGB display and text | PASS: user confirmed the earlier BoardSelfTest screen |
+| Speaker test tone | PASS: user confirmed clear continuous sound |
+| UP / DOWN / OK short and long presses | PASS: six operations matched device events |
+| Audio init / end cycling | PASS: 15 iterations over five sample rates; repeat retained stable heap |
+| Gauge communication | PASS: earlier reading 99%, approximately 4.15 V; accuracy not established |
+| Wi-Fi scan | PASS: earlier device scan returned 30 networks |
+| PushToTalk three-second capture | PASS: 48,000 samples, zero clipped samples |
+| PushToTalk replay and clear control flow | PASS: serial reports full replay and clearing; speech quality needs listening confirmation |
+| New rounded UI | PASS: user confirmed the rounded layout and recording prompt |
+| Speech quality / volume | Earlier 12 dB / 35% trial: user confirmed clear speech but low volume; 24 dB / 65% retest pending |
+| Short recording / repeat recording / playback cancellation | NOT RUN for the new PushToTalk example |
+| Original firmware restoration | NOT YET VERIFIED |
 
-Host tests cover ADC threshold boundaries, debounce, click/long-press separation,
-long holds with sparse polling, millis rollover, CW2017 conversion, and identical
-non-overlapping example partition layouts with protected cardid reservation.
+PushToTalk app image SHA-256:
+`97d1e1af761a9e4e5f647b6ac1a4508d2695acaa076d217f77d3a0c73d743c36`.
+The device reported 96,000 bytes allocated for recording and 172,792 bytes of free
+heap at startup. The first three-second recording reported peak 1235, RMS 134.23,
+zero clipped samples and 2989 ms elapsed wall time. These readings describe that
+recording, not a guarantee for all microphone distances or speech levels.
 
-Verified source commit: `80f3b5cd4c852d01ee6e000e152cbbb671266c66`.
-[Successful CI run](https://github.com/FoloToy/ai-passport-arduino/actions/runs/37589718957).
-Tool versions: Arduino CLI 1.5.1, Arduino-ESP32 3.3.12, Adafruit ST7735/ST7789
-1.11.0, Adafruit GFX 1.12.6, Adafruit BusIO 1.17.4. All seven examples produced
-an ESP32-C3 image declaring 8 MB flash and a partition table with a 3 MB factory
-application and `cardid` at `0x356000`, size `0x4000`. Documentation-only follow-up
-commits do not change the validated source or build configuration.
-No device was flashed during this validation. Physical display colors/orientation,
-button voltages, codec clocking, audible output, non-zero microphone input, battery
-accuracy, repeated begin/end, concurrent peripherals, and restoration of the old
-firmware remain unverified. Use the examples for board acceptance before a stable
-public release.
+The on-device test writes only the application at `0x10000`, retaining the existing
+bootloader and partition table. No extra firmware dump/readback is performed after
+writing; esptool's built-in write verification is used. The retained older partition
+table has no coredump partition, so Arduino's prebuilt core logs that absence at boot.
+The new example partition files reserve a coredump region, but a full installation
+of that partition table has not been device-tested. Do not confuse this boot warning
+with a recorded application panic.
+
+Remaining acceptance includes speech listening, new UI rendering, short/repeated
+recording and cancellation, display rotation/brightness, concurrent peripheral
+stress, charge/discharge accuracy, and restoration. No stable/public release is
+claimed. Raw device logs and original flash backups remain outside the repository.
+
+[Earlier successful CI run](https://github.com/FoloToy/ai-passport-arduino/actions/runs/37589718957).
+
+The current 24 dB / 65% PushToTalk retest image has SHA-256 `2d4e6bfca813bd4902057c3b2982727ec0586193d0801fc3875b827fa6d4fd60`. It was rebuilt with warnings treated as errors and written with built-in digest verification. Its listening/cancellation acceptance is pending; the device currently retains this demo for testing.

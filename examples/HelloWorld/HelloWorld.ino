@@ -2,27 +2,57 @@
 #include <FoloToyAIPassport.h>
 
 folotoy::AIPassport passport;
+bool ready = false;
+constexpr uint16_t background = 0x0864;
+constexpr uint16_t ink = 0xEF7D;
+constexpr uint16_t accent = 0x67D9;
 
 void setup() {
   Serial.begin(115200);
-  if (!passport.begin()) {
-    Serial.println(passport.lastError());
-    return;
-  }
-  passport.display.setTextColor(ST77XX_WHITE);
-  passport.display.setTextSize(2);
-  passport.display.setCursor(16, 24);
-  passport.display.println("Hello, Passport!");
-  passport.display.setTextSize(1);
-  passport.display.println("Press UP, DOWN or OK.");
+  ready = passport.begin();
+  if (!ready) { Serial.println(passport.lastError()); return; }
+  auto &d = passport.display;
+  d.fillRoundedScreen(background);
+  d.setTextWrap(false);
+  d.setTextColor(accent);
+  d.setTextSize(1);
+  d.setCursor(24, 28);
+  d.print("FOLOTOY / ARDUINO");
+  d.setTextColor(ink);
+  d.setTextSize(3);
+  d.setCursor(24, 65);
+  d.print("Hello,");
+  d.setCursor(24, 94);
+  d.print("Passport!");
+  d.fillRoundRect(18, 145, 204, 96, 18, 0x1106);
+  d.drawRoundRect(18, 145, 204, 96, 18, 0x21A9);
+  d.setTextSize(2);
+  d.setCursor(36, 167);
+  d.print("Let's build.");
+  d.setTextSize(1);
+  d.setTextColor(accent);
+  d.setCursor(36, 205);
+  d.print("Display  Audio  Buttons");
+  d.setTextColor(ink);
+  d.setCursor(24, 270);
+  d.print("Press UP, DOWN or OK");
+  d.applyCornerMask();
 }
 
 void loop() {
+  if (!ready) { delay(100); return; }
   passport.update();
-  if (passport.buttons.wasClicked(folotoy::Button::Ok)) {
-    passport.display.fillRect(16, 80, 210, 24, ST77XX_BLACK);
-    passport.display.setCursor(16, 80);
-    passport.display.println("OK clicked");
+  const char *key = nullptr;
+  if (passport.buttons.wasPressed(folotoy::Button::Up)) key = "UP pressed";
+  if (passport.buttons.wasPressed(folotoy::Button::Down)) key = "DOWN pressed";
+  if (passport.buttons.wasPressed(folotoy::Button::Ok)) key = "OK pressed";
+  if (key) {
+    passport.display.fillRect(36, 167, 170, 20, 0x1106);
+    passport.display.setTextSize(2);
+    passport.display.setTextColor(ink);
+    passport.display.setCursor(36, 167);
+    passport.display.print(key);
+    Serial.println(key);
   }
   delay(5);
 }

@@ -18,9 +18,10 @@ void loop() {
   passport.update();
   if (millis() - changedAt >= 1000) {
     changedAt = millis();
-    passport.display.fillScreen(colors[colorIndex]);
+    passport.display.fillRoundedScreen(colors[colorIndex]);
     colorIndex = (colorIndex + 1) % (sizeof(colors) / sizeof(colors[0]));
-    passport.display.drawRect(0, 0, passport.display.width(), passport.display.height(), ST77XX_BLACK);
+    passport.display.drawRoundRect(8, 8, passport.display.width() - 16, passport.display.height() - 16, 24, ST77XX_BLACK);
+    passport.display.applyCornerMask();
   }
   delay(5);
 }
