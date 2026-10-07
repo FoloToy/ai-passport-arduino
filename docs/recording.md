@@ -14,7 +14,7 @@ It needs no PSRAM, network, filesystem, or API key. Notes disappear on reset.
 - DOWN: clear a saved note, or stop playback. Clearing requires another DOWN press
   after cancelling playback.
 
-The microphone gain starts at 24 dB with clipping reported in the serial log; playback volume is 65%.
+The microphone gain starts at 24 dB with clipping reported in the serial log; playback volume is 85%.
 Adjust these in the sketch for the recording distance. The serial monitor at
 115200 baud reports samples, duration, wall time, peak, RMS, and clipped samples.
 A partial I/O transfer is an error, not a passing recording. The UI uses English

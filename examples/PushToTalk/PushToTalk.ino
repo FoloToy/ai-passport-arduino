@@ -9,6 +9,7 @@
 folotoy::AIPassport passport;
 constexpr uint32_t sampleRate = 16000;
 constexpr size_t capacity = sampleRate * 3;
+constexpr uint8_t playbackVolume = 85;  // 0–100%; adjust for the listening distance.
 constexpr size_t chunkSize = 160;  // 10 ms; keep polling the buttons.
 constexpr uint16_t background = 0x0864;
 constexpr uint16_t card = 0x1106;
@@ -151,8 +152,9 @@ void beginPlayback() {
   notice = "DOWN to stop playback";
   // Draw before unmuting/filling the small audio DMA queue.
   drawScreen();
-  if (!passport.audio.setVolume(65)) { audioError(passport.audio.lastError()); return; }
-  Serial.printf("RECORDER playback samples=%u\n", static_cast<unsigned>(captured));
+  if (!passport.audio.setVolume(playbackVolume)) { audioError(passport.audio.lastError()); return; }
+  Serial.printf("RECORDER playback samples=%u volume=%u\n",
+                static_cast<unsigned>(captured), static_cast<unsigned>(playbackVolume));
 }
 
 void finishPlayback(bool cancelled) {
