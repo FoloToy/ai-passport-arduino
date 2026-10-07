@@ -54,8 +54,10 @@ The earlier 24 dB / 85% playback image has SHA-256 `2e4ada75322d6d5c003e811928d5
 
 The 85% trial recorded a release-ended 2.33-second note: 37,280 samples, peak 2914, RMS 515.47, zero clipped samples, and a complete playback logged at 85% volume.
 
-Current 100% playback with bounded leveling image SHA-256: `816ab25cec107003a07693a505dc869d81a6b2e72cc3390dde92ca862d42f105`. Build, strict lint, image/partition checks, write digest verification, and startup passed. New host tests cover weak speech boost, DC removal, the 8x gain cap, no boost for near-silence, full-scale input headroom, and empty buffers. Final listening acceptance is pending.
+Earlier 100% playback with bounded leveling image SHA-256: `816ab25cec107003a07693a505dc869d81a6b2e72cc3390dde92ca862d42f105`. Build, strict lint, image/partition checks, write digest verification, and startup passed. New host tests cover weak speech boost, DC removal, the 8x gain cap, no boost for near-silence, full-scale input headroom, and empty buffers. Final listening acceptance is pending.
 
 [Nine-example CI](https://github.com/FoloToy/ai-passport-arduino/actions/runs/37603684217) passed for `d701010d99507127b529efa5c69ebe55b29eff1e`; this does not establish remote validation of later volume changes.
 
 The leveled 100% device trial captured 18,400 samples (1.15 s), raw peak 9243, RMS 502.67, and zero clipped samples. Leveling reported 2.16x gain and output peak 19,970. Serial confirmed complete playback at volume 100%. This establishes capture/level/replay control flow; subjective loudness remains awaiting user confirmation. The monitor closed after the USB serial device disconnected following playback.
+
+The icon-only battery UI image has SHA-256 `0af0cf18e70f7d96d3434028525d6616af5d53e9b07761fdc99c704d2e702420`. Build, image/partition checks, built-in write digest verification, and startup passed. Percentage text was removed from the demo drawing code and documentation preview. Speech listening and physical visual acceptance were not repeated for this UI change.

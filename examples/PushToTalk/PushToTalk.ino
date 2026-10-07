@@ -39,15 +39,13 @@ void label(int16_t x, int16_t y, const char *text, uint8_t size,
 void drawBattery() {
   auto &d = passport.display;
   d.fillRect(157, 26, 57, 18, background);
-  d.drawRoundRect(158, 28, 18, 10, 2, muted);
-  d.fillRect(176, 31, 2, 4, muted);
+  d.drawRoundRect(190, 28, 22, 12, 2, muted);
+  d.fillRect(212, 32, 2, 4, muted);
   if (batteryPercent >= 0) {
-    d.fillRect(160, 30, batteryPercent * 14 / 100, 6, accent);
-    char value[8];
-    snprintf(value, sizeof(value), "%d%%", batteryPercent);
-    label(183, 30, value, 1, ink);
+    d.fillRect(192, 30, batteryPercent * 18 / 100, 8, accent);
   } else {
-    label(184, 30, "--", 1, muted);
+    // Unavailable gauge: mark the battery itself, without a text label.
+    d.drawLine(193, 31, 208, 36, muted);
   }
 }
 

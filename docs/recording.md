@@ -24,14 +24,14 @@ A partial I/O transfer is an error, not a passing recording. The UI uses English
 labels with Adafruit's built-in font; no additional font assets are required.
 
 The screen follows the main firmware's 30 px black corner mask, with a battery
-indicator, rounded content card, recording state, and contextual controls.
-Gauge failure displays `--` and does not block recording. Battery polling pauses
+icon only (fill level, no percentage text), rounded content card, recording state, and contextual controls.
+Gauge failure marks the battery icon with a diagonal line and does not block recording. Battery polling pauses
 while audio is recording/playing. Only the small progress region redraws during
 audio; the sketch polls buttons between 10 ms PCM chunks.
 
 ![Push-to-talk interface](assets/push-to-talk-preview.png)
 
-Layout preview generated from the sketch geometry and built-in font; not a device photograph. The displayed 99% is illustrative.
+Layout preview generated from the sketch geometry and built-in font; not a device photograph. The battery fill level is illustrative.
 
 ## Device acceptance
 
