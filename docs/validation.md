@@ -21,7 +21,7 @@ Arduino CLI 1.5.1, USB CDC enabled.
 | PushToTalk three-second capture | PASS: 48,000 samples, zero clipped samples |
 | PushToTalk replay and clear control flow | PASS: serial reports full replay and clearing; speech quality needs listening confirmation |
 | New rounded UI | PASS: user confirmed the rounded layout and recording prompt |
-| Speech quality / volume | Earlier 12 dB / 35% trial: user confirmed clear speech but low volume; current 24 dB / 85% listening retest pending |
+| Speech quality / volume | Earlier 12 dB / 35% trial: user confirmed clear speech but low volume; 85% remained too quiet; current 100% with bounded leveling retest pending |
 | Short recording / repeat recording / playback cancellation | NOT RUN for the new PushToTalk example |
 | Original firmware restoration | NOT YET VERIFIED |
 
@@ -49,4 +49,10 @@ claimed. Raw device logs and original flash backups remain outside the repositor
 
 The earlier 24 dB / 65% PushToTalk retest image has SHA-256 `2d4e6bfca813bd4902057c3b2982727ec0586193d0801fc3875b827fa6d4fd60`. It was rebuilt with warnings treated as errors and written with built-in digest verification. It has been superseded by the 85% playback version; its listening/cancellation acceptance was not completed.
 
-The current 24 dB / 85% playback image has SHA-256 `2e4ada75322d6d5c003e811928d511dad03e6f2a3b724a7a9d87e06179625bce`. Build with warnings as errors, image/partition checks, built-in write verification, and device startup passed. User listening acceptance remains pending. The `playbackVolume` constant in PushToTalk accepts the audio API range 0–100%.
+The earlier 24 dB / 85% playback image has SHA-256 `2e4ada75322d6d5c003e811928d511dad03e6f2a3b724a7a9d87e06179625bce`. Build with warnings as errors, image/partition checks, built-in write verification, and device startup passed. The user confirmed that this version remained too quiet; it has been superseded. The `playbackVolume` constant in PushToTalk accepts the audio API range 0–100%.
+
+The 85% trial recorded a release-ended 2.33-second note: 37,280 samples, peak 2914, RMS 515.47, zero clipped samples, and a complete playback logged at 85% volume.
+
+Current 100% playback with bounded leveling image SHA-256: `816ab25cec107003a07693a505dc869d81a6b2e72cc3390dde92ca862d42f105`. Build, strict lint, image/partition checks, write digest verification, and startup passed. New host tests cover weak speech boost, DC removal, the 8x gain cap, no boost for near-silence, full-scale input headroom, and empty buffers. Final listening acceptance is pending.
+
+[Nine-example CI](https://github.com/FoloToy/ai-passport-arduino/actions/runs/37603684217) passed for `d701010d99507127b529efa5c69ebe55b29eff1e`; this does not establish remote validation of later volume changes.

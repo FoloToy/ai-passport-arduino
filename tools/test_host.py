@@ -8,10 +8,11 @@ import tempfile
 
 root = Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory(prefix="passport-host-") as tmp:
-    binary = str(Path(tmp) / "test_logic")
-    subprocess.run([os.environ.get("CXX", "c++"), "-std=c++11", "-Wall", "-Wextra", "-Werror",
-                    "-I" + str(root / "src"), str(root / "tests/test_logic.cpp"), "-o", binary], check=True)
-    subprocess.run([binary], check=True)
+    for test in ("test_logic", "test_playback_level"):
+        binary = str(Path(tmp) / test)
+        subprocess.run([os.environ.get("CXX", "c++"), "-std=c++11", "-Wall", "-Wextra", "-Werror",
+                        "-I" + str(root / "src"), str(root / "tests" / (test + ".cpp")), "-o", binary], check=True)
+        subprocess.run([binary], check=True)
 for sketch in sorted((root / "examples").iterdir()):
     assert (sketch / (sketch.name + ".ino")).is_file(), sketch
     partition = sketch / "partitions.csv"
@@ -25,4 +26,4 @@ for sketch in sorted((root / "examples").iterdir()):
     for a, b in zip(spans, spans[1:]):
         assert a[1] <= b[0], (partition, a, b)
     assert spans[-1][1] <= 8 * 1024 * 1024, partition
-print("PASS: button boundaries, debounce, long press, timer rollover, battery conversion, and example partition layouts")
+print("PASS: button boundaries, debounce, long press, timer rollover, battery conversion, playback leveling, and example partition layouts")

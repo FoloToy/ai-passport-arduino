@@ -5,11 +5,12 @@
 #include <math.h>
 #include <stdlib.h>
 #include "RecorderState.h"
+#include "PlaybackLevel.h"
 
 folotoy::AIPassport passport;
 constexpr uint32_t sampleRate = 16000;
 constexpr size_t capacity = sampleRate * 3;
-constexpr uint8_t playbackVolume = 85;  // 0–100%; adjust for the listening distance.
+constexpr uint8_t playbackVolume = 100;  // 0–100%; adjust for the listening distance.
 constexpr size_t chunkSize = 160;  // 10 ms; keep polling the buttons.
 constexpr uint16_t background = 0x0864;
 constexpr uint16_t card = 0x1106;
@@ -142,6 +143,10 @@ void finishRecording(const char *reason) {
                 static_cast<unsigned long>(millis() - startedAt),
                 static_cast<unsigned long>(peak), rms,
                 static_cast<unsigned long>(clipped));
+  const PlaybackLevel level = levelPlayback(recording, captured);
+  Serial.printf("RECORDER level inputPeak=%lu outputPeak=%lu gain=%.2f\n",
+                static_cast<unsigned long>(level.inputPeak),
+                static_cast<unsigned long>(level.outputPeak), level.gain);
   drawScreen();
   drawProgress();
 }
