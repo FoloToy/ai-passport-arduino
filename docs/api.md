@@ -29,7 +29,7 @@ It exposes Adafruit GFX methods such as `fillScreen`, `drawPixel`, `drawRect`,
 `setCursor`, `print`, and `setRotation`. Coordinates are pixels; colors are RGB565.
 No framebuffer is allocated by this library.
 
-- `bool begin(uint8_t brightness = 50)`: initialize the panel and backlight.
+- `bool beginDisplay(uint8_t brightness = 50)`: initialize the panel and backlight.
   The SPI display has no MISO, so success indicates initialization was issued,
   not confirmation that a physical panel responded.
 - `void setBrightness(uint8_t percent)`: 0–100%, clamped to 100.

@@ -7,7 +7,7 @@ PassportDisplay::PassportDisplay(SPIClass &spi)
     : Adafruit_ST7789(&spi, PassportPins::lcdCs, PassportPins::lcdDc,
                       PassportPins::lcdReset), spi_(spi) {}
 
-bool PassportDisplay::begin(uint8_t brightness) {
+bool PassportDisplay::beginDisplay(uint8_t brightness) {
   if (ready_) return true;
   const int pins[] = {PassportPins::lcdCs, PassportPins::lcdSclk,
                       PassportPins::lcdMosi, PassportPins::lcdDc, PassportPins::backlight};

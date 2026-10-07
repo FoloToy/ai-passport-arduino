@@ -3,7 +3,7 @@
 namespace folotoy {
 bool AIPassport::begin(const PassportConfig &config) {
   if (ready_) return true;
-  if (config.display && !display.begin(config.brightness)) {
+  if (config.display && !display.beginDisplay(config.brightness)) {
     error_ = "display:backlight-init-failed"; return false;
   }
   if (config.buttons) buttons.begin();

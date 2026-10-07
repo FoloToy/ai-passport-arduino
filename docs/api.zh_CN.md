@@ -17,7 +17,7 @@
 
 `passport.display` 继承 `Adafruit_ST7789`，可使用 `fillScreen`、`drawPixel`、`drawRect`、`setCursor`、`print`、`setRotation` 等 Adafruit GFX 接口。坐标单位为像素，颜色为 RGB565；本库不分配完整帧缓冲。
 
-- `begin(brightness=50)` 发送面板初始化并配置背光。SPI 没有 MISO，返回成功只说明软件初始化完成，不代表面板实际应答。
+- `beginDisplay(brightness=50)` 发送面板初始化并配置背光。SPI 没有 MISO，返回成功只说明软件初始化完成，不代表面板实际应答。
 - `setBrightness(percent)` 设置 0–100% 背光，超过 100 会限制到 100。
 - `end()` 关闭显示和背光；`isReady()` 表示软件初始化状态。
 

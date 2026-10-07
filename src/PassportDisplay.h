@@ -7,7 +7,7 @@ namespace folotoy {
 class PassportDisplay : public Adafruit_ST7789 {
  public:
   explicit PassportDisplay(SPIClass &spi = SPI);
-  bool begin(uint8_t brightness = 50);
+  bool beginDisplay(uint8_t brightness = 50);
   void end();
   void setBrightness(uint8_t percent);
   bool isReady() const { return ready_; }
