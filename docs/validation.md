@@ -22,7 +22,8 @@ Arduino CLI 1.5.1, USB CDC enabled.
 | PushToTalk replay and clear control flow | PASS: serial reports full replay and clearing; speech quality needs listening confirmation |
 | New rounded UI | PASS: user confirmed the rounded layout and recording prompt |
 | Speech quality / volume | Earlier 12 dB / 35% trial: user confirmed clear speech but low volume; 85% remained too quiet; current 100% with bounded leveling retest pending |
-| Short recording / repeat recording / playback cancellation | NOT RUN for the new PushToTalk example |
+| Short recording | PASS: release-ended 1.15 s capture and full replay in the leveled 100% version |
+| Repeat recording / playback cancellation | NOT RUN for the leveled 100% version |
 | Original firmware restoration | NOT YET VERIFIED |
 
 PushToTalk app image SHA-256:
@@ -56,3 +57,5 @@ The 85% trial recorded a release-ended 2.33-second note: 37,280 samples, peak 29
 Current 100% playback with bounded leveling image SHA-256: `816ab25cec107003a07693a505dc869d81a6b2e72cc3390dde92ca862d42f105`. Build, strict lint, image/partition checks, write digest verification, and startup passed. New host tests cover weak speech boost, DC removal, the 8x gain cap, no boost for near-silence, full-scale input headroom, and empty buffers. Final listening acceptance is pending.
 
 [Nine-example CI](https://github.com/FoloToy/ai-passport-arduino/actions/runs/37603684217) passed for `d701010d99507127b529efa5c69ebe55b29eff1e`; this does not establish remote validation of later volume changes.
+
+The leveled 100% device trial captured 18,400 samples (1.15 s), raw peak 9243, RMS 502.67, and zero clipped samples. Leveling reported 2.16x gain and output peak 19,970. Serial confirmed complete playback at volume 100%. This establishes capture/level/replay control flow; subjective loudness remains awaiting user confirmation. The monitor closed after the USB serial device disconnected following playback.
