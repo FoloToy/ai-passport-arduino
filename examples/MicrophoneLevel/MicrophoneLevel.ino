@@ -25,7 +25,12 @@ void loop() {
     const uint32_t magnitude = sample < 0 ? -sample : sample;
     if (magnitude > peak) peak = magnitude;
   }
-  if (count != sizeof(samples) / sizeof(samples[0])) Serial.println(passport.audio.lastError());
+  if (count != sizeof(samples) / sizeof(samples[0])) {
+    Serial.println(passport.audio.lastError());
+    ready = false;
+    passport.audio.end();
+    return;
+  }
   if (millis() - reportedAt >= 500) {
     reportedAt = millis();
     Serial.printf("Microphone peak: %lu\n", (unsigned long)peak);

@@ -17,7 +17,7 @@ void setup() {
   const int count = WiFi.scanNetworks();
   if (count < 0) passport.display.println("wifi:scan-failed");
   for (int i = 0; i < count && i < 12; ++i) {
-    passport.display.printf("%d: %.24s (%d dBm)\n", i + 1, WiFi.SSID(i).c_str(), WiFi.RSSI(i));
+    passport.display.printf("%d: %.24s (%d dBm)\n", i + 1, WiFi.SSID(i).c_str(), static_cast<int>(WiFi.RSSI(i)));
   }
   WiFi.scanDelete();
   WiFi.mode(WIFI_OFF);
