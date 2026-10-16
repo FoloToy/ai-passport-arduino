@@ -2,6 +2,9 @@
 
 [English](validation.md)
 
+2026-10-16 的全新环境配置与编译检查见[AI 首次使用复现记录](first-run.zh_CN.md)，
+与下方真机验收分开记录，不增加真机通过结论。
+
 验证日期：2026-10-07。ESP32-C3、8 MB Flash、Arduino-ESP32 3.3.12、Arduino CLI 1.5.1，开启 USB CDC。
 
 | 检查 | 状态 |

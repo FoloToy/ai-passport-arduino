@@ -2,6 +2,9 @@
 
 [简体中文](validation.zh_CN.md)
 
+For the separate 2026-10-16 clean-environment setup and compilation check, see
+[first-run AI onboarding](first-run.md). It adds no device acceptance claims.
+
 Validation date: 2026-10-07. ESP32-C3, 8 MB flash, Arduino-ESP32 3.3.12,
 Arduino CLI 1.5.1, USB CDC enabled.
 

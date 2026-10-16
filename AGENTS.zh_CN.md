@@ -148,6 +148,8 @@ python3 tools/verify_build.py build/HelloWorld HelloWorld
 若安装受阻，准确报告失败命令和缺少的工具，继续完成可独立执行的检查，不要声称通过。
 当前 CI 的路径过滤会跳过仅修改 Markdown 的 push/PR；没有运行记录不等于检查成功。
 
+已验证的环境配置流程及平台限制见带日期的[首次使用复现记录](docs/first-run.zh_CN.md)。
+
 ## 开发应用的顺序
 
 1. 从最小的相关示例开始。新示例目录名与 `.ino` 文件名必须一致，

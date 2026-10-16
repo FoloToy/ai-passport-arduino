@@ -160,6 +160,9 @@ and missing tool, complete the independent checks that remain possible, and do
 not claim a pass. Markdown-only pushes/PRs are excluded by this CI workflow's path filters;
 an absent run is not a successful check.
 
+Tested setup paths and platform limits are recorded in the dated
+[first-run onboarding check](docs/first-run.md).
+
 ## Building an application
 
 1. Start from the smallest matching example. A new example must have a matching
