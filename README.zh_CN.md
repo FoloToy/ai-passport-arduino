@@ -101,6 +101,9 @@ if (!passport.begin(config)) {
 
 ## 开发与贡献
 
+使用 AI 辅助开发草图或维护库时，先阅读 [AI 开发指南](AGENTS.zh_CN.md)，
+了解任务入口、编译命令与硬件约束。
+
 ```sh
 arduino-cli core update-index --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
 arduino-cli core install esp32:esp32@3.3.12 --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
