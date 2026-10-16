@@ -45,7 +45,72 @@
 Arduino-ESP32 **3.3.12**；修复无关问题时不要顺带升级核心。
 主机测试需要 Python 3 和 C++11 编译器（默认 `c++`，可通过 `CXX` 指定）。
 本库通过本地检出目录或 ZIP 安装，不要假设已被 Library Manager 收录。
-全新的 CLI 环境可安装与 CI 一致的依赖：
+
+### 首次准备 CLI
+
+下面的命令和脚本需要 Bash、Git、curl、tar、Python 3 和 C++11 编译器。
+macOS 上若 `c++ --version` 失败，先用 `xcode-select --install` 安装苹果命令行工具。
+Debian/Ubuntu 对应的软件包为 `build-essential python3 git curl ca-certificates`，
+按系统包管理器和权限要求安装。Windows 可用 WSL 执行本套 shell 与主机测试流程，
+或按 `README.zh_CN.md` 配置 Arduino IDE；原生 Windows 主机测试尚未验证。
+
+已有克隆时直接使用现有目录，从下面的状态和版本检查开始，不要在仓库内部再克隆一份。
+尚未克隆时，从父目录执行下面的克隆和 `cd` 命令。
+公开克隆不需要 GitHub 账号或私有仓库权限：
+
+```sh
+git clone https://github.com/FoloToy/ai-passport-arduino.git
+cd ai-passport-arduino
+git status --short --branch
+python3 --version
+c++ --version
+```
+
+若当前没有对应版本，用官方安装器安装 Arduino CLI 1.5.1 和 Arduino Lint 1.3.0。
+以下命令将程序放在用户目录，无需 `sudo`，也不修改 shell 启动文件：
+
+```sh
+mkdir -p "$HOME/.local/bin"
+curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/v1.5.1/install.sh | BINDIR="$HOME/.local/bin" sh -s 1.5.1
+curl -fsSL https://raw.githubusercontent.com/arduino/arduino-lint/1.3.0/etc/install.sh | BINDIR="$HOME/.local/bin" sh -s 1.3.0
+export PATH="$HOME/.local/bin:$PATH"
+arduino-cli version
+arduino-lint --version
+```
+
+各平台的下载方式见官方 [CLI 安装指南](https://arduino.github.io/arduino-cli/1.5/installation/)
+和 [Lint 安装指南](https://arduino.github.io/arduino-lint/latest/installation/)。
+替换已有程序前先检查；其他项目需要不同版本时，改用独立的安装目录。
+每次打开新 shell 都要将安装目录加入 `PATH`，或使用程序绝对路径。
+`ARDUINO_CLI` 只影响 `compile_examples.sh` 选择的 CLI 程序。
+
+首次复现时，使用全新的 Arduino 数据、下载和草图目录，避免影响已有 IDE 环境。
+后续 CLI 命令必须在保留这些环境变量的同一 shell 中执行：
+
+```sh
+export PASSPORT_ARDUINO_ENV="$(mktemp -d "${TMPDIR:-/tmp}/passport-arduino.XXXXXX")"
+export ARDUINO_DIRECTORIES_DATA="$PASSPORT_ARDUINO_ENV/data"
+export ARDUINO_DIRECTORIES_DOWNLOADS="$PASSPORT_ARDUINO_ENV/downloads"
+export ARDUINO_DIRECTORIES_USER="$PASSPORT_ARDUINO_ENV/sketchbook"
+export ARDUINO_BUILD_CACHE_PATH="$PASSPORT_ARDUINO_ENV/cache"
+export ARDUINO_UPDATER_ENABLE_NOTIFICATION=false
+arduino-cli config dump
+```
+
+确认输出的目录均指向新环境。安装前检查剩余磁盘空间：ESP32 核心 3.3.12
+会安装多种芯片的工具和库，即使本项目只使用 C3，也要为下载、解压、缓存和构建预留数 GB。
+需要能访问 GitHub、Arduino 下载站和 Espressif 包下载站。
+Arduino CLI 1.5.1 使用独立的 `network.proxy` 设置，
+只为 curl/Git 设置 `HTTPS_PROXY` 不会配置 CLI 下载代理。
+环境需要 HTTP 代理时，在同一 shell 中将 `ARDUINO_NETWORK_PROXY` 设为实际可用的地址；
+例如确有代理监听本机 7890 端口时，可执行
+`export ARDUINO_NETWORK_PROXY=http://127.0.0.1:7890`。
+使用当前环境允许的代理，不要将代理凭据写入日志或仓库。
+详见官方 [CLI 配置说明](https://arduino.github.io/arduino-cli/1.5/configuration/)。
+
+### 核心、依赖和检查
+
+安装与 CI 一致的依赖：
 
 ```sh
 arduino-cli core update-index --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
@@ -57,23 +122,30 @@ arduino-cli lib install "Adafruit ST7735 and ST7789 Library@1.11.0" "Adafruit GF
 确认已安装版本。优先使用仓库脚本中的板卡选项：
 
 ```sh
-arduino-lint --compliance strict --library-manager submit .
+arduino-lint --compliance strict --library-manager submit "$PWD"
 python3 tools/test_host.py
 bash tools/compile_examples.sh
 ```
 
+Arduino Lint 应传入仓库绝对路径：1.3.0 会将字面量参数 `.` 当作库目录名，
+即使仓库有效，也会报告 LS003。
+
 `compile_examples.sh` 将全部示例的编译警告视为错误，再通过 `tools/verify_build.py`
 检查实际生成的应用与分区二进制。使用的 FQBN 为
 `esp32:esp32:esp32c3:CDCOnBoot=cdc,FlashSize=8M,CPUFreq=160`，
-产物放在 `build/<SketchName>/`，不执行上传。可用 `ARDUINO_CLI` 指定 CLI 程序。
+产物放在 `build/<SketchName>/`，不执行上传。脚本显式设置
+`upload.maximum_size=3145728`，与 3 MB factory 分区一致；否则即使存在自定义分区文件，
+核心默认的 1.25 MB 大小检查仍可能提前拒绝较大的草图。
+可用 `ARDUINO_CLI` 指定 CLI 程序。
 迭代时只编译一个示例：
 
 ```sh
-arduino-cli compile --fqbn 'esp32:esp32:esp32c3:CDCOnBoot=cdc,FlashSize=8M,CPUFreq=160' --library . --warnings all --build-path build/HelloWorld --build-property compiler.cpp.extra_flags=-Werror --build-property compiler.c.extra_flags=-Werror examples/HelloWorld
+arduino-cli compile --fqbn 'esp32:esp32:esp32c3:CDCOnBoot=cdc,FlashSize=8M,CPUFreq=160' --library "$PWD" --warnings all --build-path "$PWD/build/HelloWorld" --build-property upload.maximum_size=3145728 --build-property compiler.cpp.extra_flags=-Werror --build-property compiler.c.extra_flags=-Werror examples/HelloWorld
 python3 tools/verify_build.py build/HelloWorld HelloWorld
 ```
 
-缺少工具时准确报告缺少的工具和未执行的检查，不要声称通过。
+缺少工具时先按安装说明准备，再运行版本检查后继续。
+若安装受阻，准确报告失败命令和缺少的工具，继续完成可独立执行的检查，不要声称通过。
 当前 CI 的路径过滤会跳过仅修改 Markdown 的 push/PR；没有运行记录不等于检查成功。
 
 ## 开发应用的顺序

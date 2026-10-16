@@ -7,6 +7,7 @@ for sketch in "$root"/examples/*; do
   echo "Compiling $(basename "$sketch")"
   build="$root/build/$(basename "$sketch")"
   "$cli" compile --fqbn "$fqbn" --library "$root" --warnings all --build-path "$build" \
+    --build-property upload.maximum_size=3145728 \
     --build-property compiler.cpp.extra_flags=-Werror \
     --build-property compiler.c.extra_flags=-Werror "$sketch"
   python3 "$root/tools/verify_build.py" "$build" "$(basename "$sketch")"

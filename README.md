@@ -58,6 +58,10 @@ Keep `partitions.csv` alongside each example sketch. For a new sketch, copy
 [`extras/partitions.csv`](extras/partitions.csv) into its folder. It limits the
 application to 3 MB and reserves `cardid` at `0x356000`.
 
+The CLI compile script also sets the size-check limit to 3 MB. If the IDE reports
+a 1.25 MB maximum for a larger sketch, use the CLI workflow below; keep the supplied
+custom partition file rather than replacing it with a generic layout.
+
 Uploading a sketch replaces the running firmware. A normal IDE upload also
 writes the bootloader and partition table and can affect existing settings.
 Back up a provisioned device before experimenting. Do not use a generic
@@ -133,7 +137,7 @@ For AI-assisted sketch development or library maintenance, start with
 arduino-cli core update-index --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
 arduino-cli core install esp32:esp32@3.3.12 --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
 arduino-cli lib install "Adafruit ST7735 and ST7789 Library" "Adafruit GFX Library"
-arduino-lint --compliance strict --library-manager submit .
+arduino-lint --compliance strict --library-manager submit "$PWD"
 python3 tools/test_host.py
 bash tools/compile_examples.sh
 ```

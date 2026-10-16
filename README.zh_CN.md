@@ -43,6 +43,9 @@
 
 示例目录中的 `partitions.csv` 必须与 `.ino` 放在一起。新项目请复制 [extras/partitions.csv](extras/partitions.csv) 到草图目录。它限制应用为 3 MB，并保留 `0x356000` 的 `cardid` 分区。
 
+CLI 编译脚本也会将程序大小检查设为 3 MB。若 IDE 为较大的草图报告 1.25 MB 上限，
+请使用下方 CLI 开发流程；保留提供的自定义分区文件，不要改用通用分区布局。
+
 上传草图会替换现有固件；Arduino IDE 常规上传还会写入 bootloader 和分区表，并可能影响已有配置。实验前应备份已配置设备。不要对已有设备使用通用文件系统/OTA 分区表或全片擦除。本库不读取、生成或修改设备身份，也不是 meta-pass 启动器槽位的安装包。详见[硬件说明](docs/hardware.zh_CN.md)。
 
 ## 快速上手
@@ -108,7 +111,7 @@ if (!passport.begin(config)) {
 arduino-cli core update-index --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
 arduino-cli core install esp32:esp32@3.3.12 --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
 arduino-cli lib install "Adafruit ST7735 and ST7789 Library" "Adafruit GFX Library"
-arduino-lint --compliance strict --library-manager submit .
+arduino-lint --compliance strict --library-manager submit "$PWD"
 python3 tools/test_host.py
 bash tools/compile_examples.sh
 ```

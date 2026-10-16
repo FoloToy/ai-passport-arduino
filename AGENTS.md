@@ -48,7 +48,79 @@ Use Arduino IDE 2.x or Arduino CLI. The checked-in CI baseline is Arduino CLI
 1.5.1 and Arduino-ESP32 **3.3.12**; do not silently upgrade the core while fixing
 an unrelated issue. Host tests need Python 3 and a C++11 compiler (`c++`, or `CXX`).
 The library is installed from this checkout/ZIP, not assumed to be in Library Manager.
-For a fresh CLI environment, install the same dependencies as CI:
+
+### First-time CLI bootstrap
+
+The shell commands and scripts require Bash, Git, curl, tar, Python 3, and a
+C++11 compiler. On macOS, install Apple's command-line tools with
+`xcode-select --install` if `c++ --version` fails. On Debian/Ubuntu, the corresponding
+packages are `build-essential python3 git curl ca-certificates` (install through
+the system package manager with the required permissions). On Windows, use WSL
+for this shell/host-test workflow, or follow the Arduino IDE setup in `README.md`;
+native Windows host tests have not been validated.
+
+If the repository is already cloned, use that checkout and start with the status
+and version checks below; do not clone another repository inside it. Otherwise,
+run the clone and `cd` commands from a parent directory. The public clone requires
+no GitHub account or private repository access:
+
+```sh
+git clone https://github.com/FoloToy/ai-passport-arduino.git
+cd ai-passport-arduino
+git status --short --branch
+python3 --version
+c++ --version
+```
+
+Install Arduino CLI 1.5.1 and Arduino Lint 1.3.0 from the official installers
+if those versions are not already available. These commands put the executables
+in a user-owned directory; they do not require `sudo` or change shell startup files:
+
+```sh
+mkdir -p "$HOME/.local/bin"
+curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/v1.5.1/install.sh | BINDIR="$HOME/.local/bin" sh -s 1.5.1
+curl -fsSL https://raw.githubusercontent.com/arduino/arduino-lint/1.3.0/etc/install.sh | BINDIR="$HOME/.local/bin" sh -s 1.3.0
+export PATH="$HOME/.local/bin:$PATH"
+arduino-cli version
+arduino-lint --version
+```
+
+See the official [CLI installation](https://arduino.github.io/arduino-cli/1.5/installation/)
+and [Lint installation](https://arduino.github.io/arduino-lint/latest/installation/)
+guides for platform-specific downloads. Check existing executables before replacing
+them; choose a separate installation directory when another project needs a different
+version. Add that directory to `PATH` in each new shell, or use its absolute executable
+paths. `ARDUINO_CLI` only selects the executable used by `compile_examples.sh`.
+
+For a clean first-run check, use empty Arduino data/download/sketchbook directories
+instead of changing an existing IDE installation. Keep these exports in the same
+shell for all subsequent CLI commands:
+
+```sh
+export PASSPORT_ARDUINO_ENV="$(mktemp -d "${TMPDIR:-/tmp}/passport-arduino.XXXXXX")"
+export ARDUINO_DIRECTORIES_DATA="$PASSPORT_ARDUINO_ENV/data"
+export ARDUINO_DIRECTORIES_DOWNLOADS="$PASSPORT_ARDUINO_ENV/downloads"
+export ARDUINO_DIRECTORIES_USER="$PASSPORT_ARDUINO_ENV/sketchbook"
+export ARDUINO_BUILD_CACHE_PATH="$PASSPORT_ARDUINO_ENV/cache"
+export ARDUINO_UPDATER_ENABLE_NOTIFICATION=false
+arduino-cli config dump
+```
+
+Confirm the reported directories point at the new environment. Check free disk
+space before installation: ESP32 core 3.3.12 installs tools/libraries for several
+chips even though this project targets C3. Allow several GB for downloads, extracted
+tools, caches, and builds. Network access to GitHub, Arduino downloads, and Espressif
+package hosts is required. Arduino CLI 1.5.1 uses its own `network.proxy` setting;
+setting only `HTTPS_PROXY` for curl/Git does not configure CLI downloads. If your
+environment requires an HTTP proxy, set `ARDUINO_NETWORK_PROXY` to its working URL
+in this same shell, for example `export ARDUINO_NETWORK_PROXY=http://127.0.0.1:7890`
+when a proxy actually listens there. Use your environment's approved endpoint;
+keep proxy credentials out of logs and the repository. See the official
+[CLI configuration](https://arduino.github.io/arduino-cli/1.5/configuration/).
+
+### Core, libraries, and checks
+
+Install the same dependencies as CI:
 
 ```sh
 arduino-cli core update-index --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
@@ -60,24 +132,32 @@ Check installed versions with `arduino-cli version`, `arduino-cli core list`, an
 `arduino-cli lib list`. Use the scripts rather than inventing board options:
 
 ```sh
-arduino-lint --compliance strict --library-manager submit .
+arduino-lint --compliance strict --library-manager submit "$PWD"
 python3 tools/test_host.py
 bash tools/compile_examples.sh
 ```
 
+Pass the absolute repository path to Arduino Lint: version 1.3.0 treats a literal
+`.` argument as the library folder name and reports LS003 even for a valid checkout.
+
 `compile_examples.sh` builds every example with warnings treated as errors, then
 checks each actual image and partition binary with `tools/verify_build.py`. It
 uses `esp32:esp32:esp32c3:CDCOnBoot=cdc,FlashSize=8M,CPUFreq=160`, writes to
-`build/<SketchName>/`, and never uploads. `ARDUINO_CLI` can select a CLI executable.
+`build/<SketchName>/`, and never uploads. It sets `upload.maximum_size=3145728`
+to match the 3 MB factory partition; the core's default 1.25 MB size limit would
+otherwise reject larger sketches even with the custom partition file present.
+`ARDUINO_CLI` can select a CLI executable.
 For one-example iteration:
 
 ```sh
-arduino-cli compile --fqbn 'esp32:esp32:esp32c3:CDCOnBoot=cdc,FlashSize=8M,CPUFreq=160' --library . --warnings all --build-path build/HelloWorld --build-property compiler.cpp.extra_flags=-Werror --build-property compiler.c.extra_flags=-Werror examples/HelloWorld
+arduino-cli compile --fqbn 'esp32:esp32:esp32c3:CDCOnBoot=cdc,FlashSize=8M,CPUFreq=160' --library "$PWD" --warnings all --build-path "$PWD/build/HelloWorld" --build-property upload.maximum_size=3145728 --build-property compiler.cpp.extra_flags=-Werror --build-property compiler.c.extra_flags=-Werror examples/HelloWorld
 python3 tools/verify_build.py build/HelloWorld HelloWorld
 ```
 
-If a tool is missing, report the exact missing tool/check instead of claiming a
-pass. Markdown-only pushes/PRs are excluded by this CI workflow's path filters;
+If a tool is missing, follow the bootstrap instructions and rerun its version
+check before continuing. If installation is blocked, report the failed command
+and missing tool, complete the independent checks that remain possible, and do
+not claim a pass. Markdown-only pushes/PRs are excluded by this CI workflow's path filters;
 an absent run is not a successful check.
 
 ## Building an application
